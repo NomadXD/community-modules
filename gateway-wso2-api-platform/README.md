@@ -15,7 +15,7 @@ This document provides comprehensive documentation for integrating WSO2 API Plat
 
 ## Overview
 
-OpenChoreo uses the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/) as the standard API for exposing component endpoints to public or internal networks. The [WSO2 API Platform for Kubernetes](https://wso2.com/api-platform-for-k8s/) provides enterprise API management capabilities — including rate limiting, authentication, and API lifecycle management — through its own CRDs (`RestApi`, `APIGateway`).
+OpenChoreo uses the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/) as the standard API for exposing component endpoints to public or internal networks. The [WSO2 API Platform](https://github.com/wso2/api-platform) provides enterprise API management capabilities — including rate limiting, authentication, and API lifecycle management — through its own CRDs (`RestApi`, `APIGateway`).
 
 Unlike Kong, Traefik, or Envoy Gateway, **WSO2 API Platform does not implement the Kubernetes Gateway API**. It cannot serve as a drop-in replacement for kgateway. Instead, this module deploys WSO2 API Platform alongside the default kgateway and routes traffic through the WSO2 router by replacing the HTTPRoute's `backendRef` with a kgateway `Backend` resource pointing to the WSO2 API Platform router.
 
@@ -341,8 +341,8 @@ spec:
   allowedTraits:
     - name: api-configuration
     - name: observability-alert-rule
-    - name: api-management          # Add this line
-      kind: ClusterTrait            # Required since it's a ClusterTrait
+    - name: api-management # Add this line
+      kind: ClusterTrait # Required since it's a ClusterTrait
 ```
 
 > **Note:** Without this entry, the Component webhook will reject any Component that references the `api-management` trait with a validation error.
@@ -511,42 +511,6 @@ The standard gateway values continue to apply to kgateway:
 | `gateway.tls.hostname`        | string | `"*.openchoreoapis.localhost"` | Wildcard hostname for TLS certificate    |
 | `gateway.tls.certificateRefs` | string | `"openchoreo-gateway-tls"`     | Secret name for the TLS certificate      |
 | `gateway.infrastructure`      | object | `{}`                           | Cloud provider load balancer annotations |
-
-### DataPlane CR Gateway Configuration
-
-The DataPlane CR defines gateway metadata used by the control plane for endpoint URL resolution. Since kgateway remains the Gateway API controller, the configuration is unchanged:
-
-```yaml
-apiVersion: openchoreo.dev/v1alpha1
-kind: DataPlane
-metadata:
-  name: default
-spec:
-  gateway:
-    publicVirtualHost: "example.com"
-    publicHTTPSPort: 19443
-    publicHTTPPort: 19080
-    publicGatewayName: "gateway-default"
-    publicGatewayNamespace: "openchoreo-data-plane"
-    organizationVirtualHost: "org.example.com"
-    organizationHTTPSPort: 19444
-```
-
-### Environment-Level Overrides
-
-Environments can override gateway configuration from the DataPlane:
-
-```yaml
-apiVersion: openchoreo.dev/v1alpha1
-kind: Environment
-metadata:
-  name: production
-spec:
-  gateway:
-    publicVirtualHost: "prod.example.com"
-```
-
-If `publicVirtualHost` is set on the Environment, its gateway config takes full precedence over the DataPlane config.
 
 ### WSO2 API Platform Router Configuration
 
