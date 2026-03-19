@@ -324,6 +324,29 @@ Deploy the sample greeting service to verify end-to-end traffic flow through WSO
 kubectl apply -f wso2-api-platform-api-configuration-trait.yaml
 ```
 
+**Update the ClusterComponentType to allow the trait:**
+
+The `api-management` trait must be listed in the ComponentType's `allowedTraits` before components can use it. Patch the `ClusterComponentType/deployment/service` (or whichever ComponentType your components use) to add the trait:
+
+```bash
+kubectl patch clustercomponenttype service --type='json' -p='[
+  {"op": "add", "path": "/spec/allowedTraits/-", "value": {"name": "api-management", "kind": "ClusterTrait"}}
+]'
+```
+
+Alternatively, edit the ComponentType YAML directly and re-apply it:
+
+```yaml
+spec:
+  allowedTraits:
+    - name: api-configuration
+    - name: observability-alert-rule
+    - name: api-management          # Add this line
+      kind: ClusterTrait            # Required since it's a ClusterTrait
+```
+
+> **Note:** Without this entry, the Component webhook will reject any Component that references the `api-management` trait with a validation error.
+
 **Apply the Component and Workload:**
 
 ```bash
