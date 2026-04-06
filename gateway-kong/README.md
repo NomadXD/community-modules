@@ -186,17 +186,17 @@ helm repo update
 
 # Install Kong with Gateway API support
 helm install kong kong/ingress \
-  --namespace openchoreo-data-plane \
-  --set gateway.enabled=true \
-  --set gateway.podLabels.openchoreo\.dev/system-component=gateway \
-  --set ingressController.enabled=true \
-  --set ingressController.installCRDs=true \
-  --set ingressController.gatewayAPI.enabled=true \
-  --set gateway.env.proxy_listen="0.0.0.0:19080" \
-  --set gateway.proxy.type=LoadBalancer \
-  --set gateway.proxy.http.enabled=true \
-  --set gateway.proxy.http.servicePort=19080 \
-  --set gateway.proxy.http.containerPort=19080
+    --namespace openchoreo-data-plane \
+    --set gateway.enabled=true \
+    --set-string 'gateway.podLabels.openchoreo\.dev/system-component=gateway' \
+    --set ingressController.enabled=true \
+    --set ingressController.installCRDs=true \
+    --set ingressController.gatewayAPI.enabled=true \
+    --set gateway.env.proxy_listen="0.0.0.0:19080" \
+    --set gateway.proxy.type=LoadBalancer \
+    --set gateway.proxy.http.enabled=true \
+    --set gateway.proxy.http.servicePort=19080 \
+    --set gateway.proxy.http.containerPort=19080
 
 # Wait for Kong to be ready
 kubectl wait --for=condition=ready pod \
